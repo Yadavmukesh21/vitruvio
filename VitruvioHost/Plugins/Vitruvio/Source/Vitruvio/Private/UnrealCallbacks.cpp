@@ -171,6 +171,7 @@ void UnrealCallbacks::addMesh(const wchar_t* name, int32_t prototypeId, const wc
 		{
 			MeshMaterials.Add(MaterialContainer);
 			PolygonGroupId = Description.CreatePolygonGroup();
+			MeshMaterialMap.Add(MaterialContainer, PolygonGroupId);
 		}
 		
 		// Create Geometry
