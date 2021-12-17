@@ -26,7 +26,7 @@
 class UVitruvioComponent;
 
 USTRUCT()
-struct VITRUVIO_API FInitialShapeFace
+struct VITRUVIO_API FInitialShapeHole
 {
 	GENERATED_BODY()
 
@@ -34,14 +34,32 @@ struct VITRUVIO_API FInitialShapeFace
 	TArray<FVector> Vertices;
 };
 
+USTRUCT()
+struct VITRUVIO_API FInitialShapeFace
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<FVector> Vertices;
+	UPROPERTY()
+	TArray<FInitialShapeHole> Holes;
+};
+
+USTRUCT()
+struct VITRUVIO_API FInitialShapePolygon
+{
+	GENERATED_BODY()
+	
+	TArray<FInitialShapeFace> Faces;
+};
+
 UCLASS(Abstract)
 class VITRUVIO_API UInitialShape : public UObject
 {
 	GENERATED_BODY()
 
-	// Non triangulated vertices per face
 	UPROPERTY()
-	TArray<FInitialShapeFace> Faces;
+	FInitialShapePolygon Polygon;
 
 protected:
 	UPROPERTY()
@@ -54,9 +72,9 @@ protected:
 	UVitruvioComponent* VitruvioComponent;
 
 public:
-	const TArray<FInitialShapeFace>& GetFaces() const
+	const FInitialShapePolygon& GetPolygon() const
 	{
-		return Faces;
+		return Polygon;
 	}
 
 	TArray<FVector> GetVertices() const;
@@ -71,9 +89,9 @@ public:
 		return InitialShapeSceneComponent;
 	}
 
-	void SetFaces(const TArray<FInitialShapeFace>& InFaces);
+	void SetPolygon(const FInitialShapePolygon& InFaces);
 	
-	virtual void Initialize(UVitruvioComponent* Component, const TArray<FInitialShapeFace>& InitialFaces)
+	virtual void Initialize(UVitruvioComponent* Component, const FInitialShapePolygon& InitialShapePolygon)
 	{
 		unimplemented();
 	}
@@ -111,7 +129,7 @@ public:
 	GENERATED_BODY()
 
 	virtual void Initialize(UVitruvioComponent* Component) override;
-	virtual void Initialize(UVitruvioComponent* Component, const TArray<FInitialShapeFace>& InitialFaces) override;
+	virtual void Initialize(UVitruvioComponent* Component, const FInitialShapePolygon& InitialShapePolygon) override;
 	virtual bool CanConstructFrom(AActor* Owner) const override;
 	virtual void SetHidden(bool bHidden) override;
 
@@ -136,7 +154,7 @@ public:
 	int32 SplineApproximationPoints = 15;
 
 	virtual void Initialize(UVitruvioComponent* Component) override;
-	virtual void Initialize(UVitruvioComponent* Component, const TArray<FInitialShapeFace>& InitialFaces) override;
+	virtual void Initialize(UVitruvioComponent* Component, const FInitialShapePolygon& InitialShapePolygon) override;
 	virtual bool CanConstructFrom(AActor* Owner) const override;
 
 #if WITH_EDITOR

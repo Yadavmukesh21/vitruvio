@@ -120,14 +120,15 @@ public:
 	}
 };
 
-void SetInitialShapeGeometry(const InitialShapeBuilderUPtr& InitialShapeBuilder, const TArray<FInitialShapeFace>& InitialShape)
+void SetInitialShapeGeometry(const InitialShapeBuilderUPtr& InitialShapeBuilder, const FInitialShapePolygon& InitialShape)
 {
 	std::vector<double> vertexCoords;
 	std::vector<uint32_t> indices;
 	std::vector<uint32_t> faceCounts;
+	std::vector<uint32_t> holes;
 
 	uint32_t CurrentIndex = 0;
-	for (const FInitialShapeFace& Face : InitialShape)
+	for (const FInitialShapeFace& Face : InitialShape.Faces)
 	{
 		faceCounts.push_back(Face.Vertices.Num());
 		for (const FVector& Vertex : Face.Vertices)
@@ -139,10 +140,32 @@ void SetInitialShapeGeometry(const InitialShapeBuilderUPtr& InitialShapeBuilder,
 			vertexCoords.push_back(CEVertex.Y);
 			vertexCoords.push_back(CEVertex.Z);
 		}
+
+		if (Face.Holes.Num() > 0)
+		{
+			holes.push_back(faceCounts.size() - 1);
+
+			for (const FInitialShapeHole Hole : Face.Holes)
+			{
+				faceCounts.push_back(Hole.Vertices.Num());
+				for (const FVector& Vertex : Hole.Vertices)
+				{
+					indices.push_back(CurrentIndex++);
+
+					const FVector CEVertex = FVector(Vertex.X, Vertex.Z, Vertex.Y) / 100.0;
+					vertexCoords.push_back(CEVertex.X);
+					vertexCoords.push_back(CEVertex.Y);
+					vertexCoords.push_back(CEVertex.Z);
+				}
+				holes.push_back(faceCounts.size() - 1);
+			}
+
+			holes.push_back(std::numeric_limits<uint32_t>::max());
+		}
 	}
 
 	const prt::Status SetGeometryStatus = InitialShapeBuilder->setGeometry(vertexCoords.data(), vertexCoords.size(), indices.data(), indices.size(),
-																		   faceCounts.data(), faceCounts.size());
+																		   faceCounts.data(), faceCounts.size(), holes.data(), holes.size());
 
 	if (SetGeometryStatus != prt::STATUS_OK)
 	{
@@ -150,8 +173,8 @@ void SetInitialShapeGeometry(const InitialShapeBuilderUPtr& InitialShapeBuilder,
 	}
 }
 
-AttributeMapUPtr EvaluateRuleAttribtues(const std::wstring& RuleFile, const std::wstring& StartRule, AttributeMapUPtr Attributes, const ResolveMapSPtr& ResolveMapPtr,
-										   const TArray<FInitialShapeFace>& InitialShape, prt::Cache* Cache, const int32 RandomSeed)
+AttributeMapUPtr EvaluateRuleAttributes(const std::wstring& RuleFile, const std::wstring& StartRule, AttributeMapUPtr Attributes, const ResolveMapSPtr& ResolveMapPtr,
+										   const FInitialShapePolygon& InitialShape, prt::Cache* Cache, const int32 RandomSeed)
 {
 	AttributeMapBuilderUPtr UnrealCallbacksAttributeBuilder(prt::AttributeMapBuilder::create());
 	UnrealCallbacks UnrealCallbacks(UnrealCallbacksAttributeBuilder);
@@ -319,7 +342,7 @@ Vitruvio::FTextureData VitruvioModule::DecodeTexture(UObject* Outer, const FStri
 	return Vitruvio::DecodeTexture(Outer, Key, Path, TextureMetadata, std::move(Buffer), BufferSize);
 }
 
-FGenerateResult VitruvioModule::GenerateAsync(const TArray<FInitialShapeFace>& InitialShape, URulePackage* RulePackage, AttributeMapUPtr Attributes,
+FGenerateResult VitruvioModule::GenerateAsync(const FInitialShapePolygon& InitialShape, URulePackage* RulePackage, AttributeMapUPtr Attributes,
 											  const int32 RandomSeed) const
 {
 	check(RulePackage);
@@ -346,7 +369,7 @@ FGenerateResult VitruvioModule::GenerateAsync(const TArray<FInitialShapeFace>& I
 	return FGenerateResult{MoveTemp(ResultFuture), Token};
 }
 
-FGenerateResultDescription VitruvioModule::Generate(const TArray<FInitialShapeFace>& InitialShape, URulePackage* RulePackage,
+FGenerateResultDescription VitruvioModule::Generate(const FInitialShapePolygon& InitialShape, URulePackage* RulePackage,
 													AttributeMapUPtr Attributes, const int32 RandomSeed) const
 {
 	check(RulePackage);
@@ -433,7 +456,7 @@ FGenerateResultDescription VitruvioModule::Generate(const TArray<FInitialShapeFa
 	return FGenerateResultDescription {OutputHandler->GetInstances(), OutputHandler->GetMeshes(), OutputHandler->GetNames() };
 }
 
-FAttributeMapResult VitruvioModule::EvaluateRuleAttributesAsync(const TArray<FInitialShapeFace>& InitialShape, URulePackage* RulePackage,
+FAttributeMapResult VitruvioModule::EvaluateRuleAttributesAsync(const FInitialShapePolygon& InitialShape, URulePackage* RulePackage,
 															AttributeMapUPtr Attributes, const int32 RandomSeed) const
 {
 	check(RulePackage);
@@ -471,7 +494,7 @@ FAttributeMapResult VitruvioModule::EvaluateRuleAttributesAsync(const TArray<FIn
 		}
 
 		AttributeMapUPtr DefaultAttributeMap(
-			EvaluateRuleAttribtues(RuleFile.c_str(), StartRule.c_str(), std::move(Attributes), ResolveMap, InitialShape, PrtCache.get(), RandomSeed));
+			EvaluateRuleAttributes(RuleFile.c_str(), StartRule.c_str(), std::move(Attributes), ResolveMap, InitialShape, PrtCache.get(), RandomSeed));
 
 		LoadAttributesCounter.Decrement();
 

@@ -142,7 +142,7 @@ public:
 	 * \param RandomSeed
 	 * \return the generated UStaticMesh.
 	 */
-	VITRUVIO_API FGenerateResult GenerateAsync(const TArray<FInitialShapeFace>& InitialShape, URulePackage* RulePackage, AttributeMapUPtr Attributes,
+	VITRUVIO_API FGenerateResult GenerateAsync(const FInitialShapePolygon& InitialShape, URulePackage* RulePackage, AttributeMapUPtr Attributes,
 											   const int32 RandomSeed) const;
 
 	/**
@@ -154,7 +154,7 @@ public:
 	 * \param RandomSeed
 	 * \return the generated UStaticMesh.
 	 */
-	VITRUVIO_API FGenerateResultDescription Generate(const TArray<FInitialShapeFace>& InitialShape, URulePackage* RulePackage,
+	VITRUVIO_API FGenerateResultDescription Generate(const FInitialShapePolygon& InitialShape, URulePackage* RulePackage,
 													 AttributeMapUPtr Attributes, const int32 RandomSeed) const;
 
 	/**
@@ -166,7 +166,7 @@ public:
 	 * \param RandomSeed
 	 * \return
 	 */
-	VITRUVIO_API FAttributeMapResult EvaluateRuleAttributesAsync(const TArray<FInitialShapeFace>& InitialShape, URulePackage* RulePackage,
+	VITRUVIO_API FAttributeMapResult EvaluateRuleAttributesAsync(const FInitialShapePolygon& InitialShape, URulePackage* RulePackage,
 															 AttributeMapUPtr Attributes, const int32 RandomSeed) const;
 
 	/**

@@ -17,14 +17,33 @@
 
 namespace Vitruvio
 {
+
+struct FHole
+{
+	TArray<FVector> Vertices;
+};
+
+struct FFace
+{
+	TArray<FVector> Vertices;
+	TArray<FHole> Holes;
+};
+
+struct FPolygon
+{
+	TArray<FFace> Faces;
+};
+
 /**
- * Takes a set of polygons and returns a vertex array representing the outside winding.
- * This will work for convex or concave sets of polygons but not for concave polygons with holes.
+ * Takes a triangulated input mesh (vertices and indices) and returns a polygon consisting of faces with holes
+ * 
+ * This will work for convex or concave polygons and polygons with holes.
  *
  * Note: This function is adapted from FPoly#GetOutsideWindings.
  *
  * @param InVertices	Input vertices
  * @param InIndices		Input triangle indices
  */
-TArray<TArray<FVector>> GetOutsideWindings(const TArray<FVector>& InVertices, const TArray<int32>& InIndices);
+FPolygon GetPolygon(const TArray<FVector>& InVertices, const TArray<int32>& InIndices);
+
 } // namespace Vitruvio
