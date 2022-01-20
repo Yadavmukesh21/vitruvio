@@ -1,0 +1,14 @@
+name: build-vitruvio
+on: [push, workflow_dispatch]
+  branches:
+    - main
+    - develop
+    - 'arisona/workflows'
+
+jobs:
+  build_vitruvio:
+    runs-on: [self-hosted, windows, x64]
+      - uses: actions/checkout@v2
+      - name: Run UE build for Vitruvio
+        run: |
+          echo "Yay. First run. On $GITHUB_WORKSPACE"
