@@ -14,4 +14,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          echo "Yay. First run. On $GITHUB_WORKSPACE"
+          echo "Yay. First run. On $env:GITHUB_WORKSPACE ${{github.workspace}}"
