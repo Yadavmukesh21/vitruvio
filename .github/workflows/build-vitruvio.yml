@@ -1,13 +1,8 @@
 name: build-vitruvio
-on: 
-  push:
-    branches:
-      - main
-      - develop
-      - 'arisona/workflows'
+on: push
 
 jobs:
-  build-ue4-vitruvio:
+  vitruvio:
     runs-on: [self-hosted, windows, x64]
       - uses: actions/checkout@v2
       - name: Run UE build for Vitruvio
