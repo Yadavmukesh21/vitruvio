@@ -1,9 +1,10 @@
 name: build-vitruvio
-on: push
-  branches:
-    - main
-    - develop
-    - 'arisona/workflows'
+on: 
+  push:
+    branches:
+      - main
+      - develop
+      - 'arisona/workflows'
 
 jobs:
   build_vitruvio:
