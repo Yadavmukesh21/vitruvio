@@ -17,8 +17,14 @@ jobs:
           echo "Build vitruvio host debug"
           C:\dev\git\zrh-xr-devops\scripts\ue_build_project.py vitruvio_host_main_package_debug
 
-    if: github.ref == 'refs/heads/develop'  || github.ref == 'refs/heads/arisona/workflows'
+    if: github.ref == 'refs/heads/develop'
     steps:
       - run: |
           echo "Build vitruvio develop branch"
+          C:\dev\git\zrh-xr-devops\scripts\ue_build_project.py vitruvio_host_develop_package_debug
+
+    if: github.ref == 'refs/heads/arisona/workflows'
+    steps:
+      - run: |
+          echo "Build vitruvio develop branch (for actions development)"
           C:\dev\git\zrh-xr-devops\scripts\ue_build_project.py vitruvio_host_develop_package_debug
