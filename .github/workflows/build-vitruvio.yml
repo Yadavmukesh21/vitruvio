@@ -7,7 +7,7 @@ on:
       - 'arisona/workflows'
 
 jobs:
-  build_vitruvio:
+  build-ue4-vitruvio:
     runs-on: [self-hosted, windows, x64]
       - uses: actions/checkout@v2
       - name: Run UE build for Vitruvio
